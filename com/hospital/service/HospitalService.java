@@ -5,35 +5,47 @@ import com.hospital.exception.PatientNotFoundException;
 import java.io.*;
 
 public class HospitalService {
-  public void addPatient(Patient p) throws Exception {
-    BufferedWriter bw = new BufferedWriter(new FileWriter("patients.txt", true));
-    bw.write(p.getPatientId() + "," + p.getPatientName() + "," + p.getAge() + "," + p.getDisease());
-    bw.newLine();
-    bw.close();
-  }
 
-  public void searchPatient(String patientId) throws Exception {
-    BufferedReader br = new BufferedReader(new FileReader("patients.txt"));
-    String line;
-    while ((line = br.readLine()) != null) {
-      String[] d = line.split(",");
-      if (d[0].equals(patientId)) {
+    public void addPatient(Patient patient) throws Exception {
+        FileWriter fw = new FileWriter("patients.txt", true);
+        fw.write(patient.getPatientId() + "," + patient.getPatientName() + "," + patient.getAge() + "," + patient.getDisease());
+        fw.write("\n");
+        fw.close();
+    }
+
+    public void searchPatient(String patientId) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader("patients.txt"));
+        String line;
+        boolean found = false;
+
+        while ((line = br.readLine()) != null) {
+            String arr[] = line.split(",");
+
+            if (arr[0].equals(patientId)) {
+                Patient patient = new Patient(arr[0], arr[1], arr[2], arr[3]);
+                patient.displayPatient();
+                found = true;
+                break;
+            }
+        }
+
         br.close();
-        new Patient(d[0], d[1], d[2], d[3]).displayPatient();
-        return;
-      }
-    }
-    br.close();
-    throw new PatientNotFoundException("Patient with ID " + patientId + " not found.");
-  }
 
-  public void displayPatients() throws Exception {
-    BufferedReader br = new BufferedReader(new FileReader("patients.txt"));
-    String line;
-    while ((line = br.readLine()) != null) {
-      String[] d = line.split(",");
-      new Patient(d[0], d[1], d[2], d[3]).displayPatient();
+        if (found == false) {
+            throw new PatientNotFoundException("Patient not found");
+        }
     }
-    br.close();
-  }
+
+    public void displayPatients() throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader("patients.txt"));
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            String arr[] = line.split(",");
+            Patient patient = new Patient(arr[0], arr[1], arr[2], arr[3]);
+            patient.displayPatient();
+        }
+
+        br.close();
+    }
 }
